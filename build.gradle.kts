@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.eclipse.jetty:jetty-server:11.0.18")
+    implementation("org.eclipse.jetty:jetty-servlet:11.0.18")
     testImplementation(kotlin("test"))
 }
 
@@ -18,5 +20,5 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(17)
 }
