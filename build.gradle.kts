@@ -13,6 +13,8 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-server:11.0.18")
     implementation("org.eclipse.jetty:jetty-servlet:11.0.18")
     testImplementation(kotlin("test"))
+    testImplementation("org.assertj:assertj-core:3.24.2")
+
 }
 
 tasks.test {

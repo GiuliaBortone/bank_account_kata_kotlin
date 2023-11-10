@@ -1,3 +1,4 @@
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.net.http.HttpClient
@@ -18,8 +19,9 @@ class CreateNewAccountAPITest {
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        val responseStatusCode = response.statusCode()
-        assertEquals(201, responseStatusCode)
-        //TODO assert body risposta
+        assertEquals(201, response.statusCode())
+        val validUUIDv4Regex = """[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"""
+        val expectedBodyRegex = """\{"id":"$validUUIDv4Regex"\}"""
+        assertThat(response.body()).matches(expectedBodyRegex)
     }
 }

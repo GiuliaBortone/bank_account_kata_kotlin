@@ -3,6 +3,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
+import java.util.UUID
 
 
 fun main() {
@@ -15,8 +16,8 @@ fun main() {
 class RouterServlet : HttpServlet() {
 
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        val newAccountID = UUID.randomUUID()
         resp.status = HttpServletResponse.SC_CREATED
-        resp.writer.println("Brava Giulia!")
+        resp.writer.print("""{"id":"$newAccountID"}""")
     }
-
 }
