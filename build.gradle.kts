@@ -7,6 +7,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {
@@ -14,7 +15,7 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-servlet:11.0.18")
     testImplementation(kotlin("test"))
     testImplementation("org.assertj:assertj-core:3.24.2")
-
+    testImplementation("com.github.DaikonWeb:topinambur:1.12.0")
 }
 
 tasks.test {
