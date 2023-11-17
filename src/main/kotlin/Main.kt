@@ -18,6 +18,6 @@ class RouterServlet : HttpServlet() {
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         val newAccountID = UUID.randomUUID()
         resp.status = HttpServletResponse.SC_CREATED
-        resp.writer.print("""{"id":"$newAccountID"}""")
+        resp.writer.print("""{"id": "$newAccountID"}""".trimMargin())
     }
 }
