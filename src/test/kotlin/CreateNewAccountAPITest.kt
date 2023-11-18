@@ -1,7 +1,8 @@
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -10,14 +11,15 @@ import java.net.http.HttpResponse
 import java.util.*
 import kotlin.test.assertEquals
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CreateNewAccountAPITest {
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
         BankApp().start()
     }
 
     @Test
-    fun `POST empty request should return 201 and account ID`() {
+    fun `POST empty request should return 201 and valid account ID`() {
         // arrange
         val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
@@ -32,7 +34,21 @@ class CreateNewAccountAPITest {
         assertValidUUID(responseBody.asJsonObject.get("id").asString)
     }
 
+    @Test
+    fun `get a non existent account returns 404`() {
+        val client = HttpClient.newBuilder().build()
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/accounts/non-existent-uuid/statement"))
+            .GET()
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertThat(response.statusCode()).isEqualTo(404)
+    }
+
     private fun assertValidUUID(value: String?) {
-        assertThat(UUID.fromString(value).version()).withFailMessage("expected UUID version 4, but found $value ").isEqualTo(4)
+        assertThat(UUID.fromString(value).version()).withFailMessage("expected UUID version 4, but found $value ")
+            .isEqualTo(4)
     }
 }
