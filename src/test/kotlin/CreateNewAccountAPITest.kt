@@ -1,5 +1,6 @@
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.URI
 import java.net.http.HttpClient
@@ -10,6 +11,11 @@ import java.util.*
 import kotlin.test.assertEquals
 
 class CreateNewAccountAPITest {
+    @BeforeEach
+    fun setUp() {
+        BankApp().start()
+    }
+
     @Test
     fun `POST empty request should return 201 and account ID`() {
         // arrange
