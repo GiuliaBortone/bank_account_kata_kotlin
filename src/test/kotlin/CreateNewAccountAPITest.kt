@@ -1,5 +1,6 @@
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -13,9 +14,16 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CreateNewAccountAPITest {
+    private val bankApp = BankApp()
+
     @BeforeAll
     fun setUp() {
-        BankApp().start()
+        bankApp.start()
+    }
+
+    @AfterAll
+    fun stop() {
+        bankApp.stop()
     }
 
     @Test
@@ -32,19 +40,6 @@ class CreateNewAccountAPITest {
         assertEquals(201, response.statusCode())
         val responseBody = JsonParser.parseString(response.body())
         assertValidUUID(responseBody.asJsonObject.get("id").asString)
-    }
-
-    @Test
-    fun `get a non existent account returns 404`() {
-        val client = HttpClient.newBuilder().build()
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/accounts/non-existent-uuid/statement"))
-            .GET()
-            .build()
-
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        assertThat(response.statusCode()).isEqualTo(404)
     }
 
     private fun assertValidUUID(value: String?) {

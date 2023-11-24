@@ -6,11 +6,16 @@ import org.eclipse.jetty.servlet.ServletContextHandler
 import java.util.*
 
 class BankApp {
+    private val server = Server(8080)
+
     fun start() {
-        val server = Server(8080)
         val context = ServletContextHandler(server, "/")
         context.addServlet(RouterServlet::class.java, "/*")
         server.start()
+    }
+
+    fun stop() {
+        server.stop()
     }
 }
 
