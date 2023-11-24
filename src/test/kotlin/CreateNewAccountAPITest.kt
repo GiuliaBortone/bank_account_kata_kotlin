@@ -47,4 +47,19 @@ class CreateNewAccountAPITest {
             .withFailMessage("expected UUID version 4, but found $value")
             .isEqualTo(4)
     }
+
+    companion object {
+        fun createNewAccount(client: HttpClient): String {
+            val request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/create-new-account"))
+                .POST(BodyPublishers.noBody())
+                .build()
+
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+            assertEquals(201, response.statusCode())
+            val responseBody = JsonParser.parseString(response.body())
+            return responseBody.asJsonObject.get("id").asString
+        }
+    }
 }

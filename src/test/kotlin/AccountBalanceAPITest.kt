@@ -1,3 +1,4 @@
+import CreateNewAccountAPITest.Companion.createNewAccount
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -38,7 +39,7 @@ class AccountBalanceAPITest {
 
     @Test
     fun `get the balance of a existing account returns 200 and balance to date`() {
-        val existingAccountUUID = createNewAccount()
+        val existingAccountUUID = createNewAccount(client)
         val request = getRequest("/accounts/$existingAccountUUID/balance")
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -47,19 +48,6 @@ class AccountBalanceAPITest {
         val responseBody = JsonParser.parseString(response.body()).asJsonObject
         assertEquals(BigDecimal.ZERO, responseBody.get("balance").asBigDecimal)
         assertValidDateTime(responseBody.get("date").asString)
-    }
-
-    private fun createNewAccount(): String {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/create-new-account"))
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build()
-
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        assertEquals(201, response.statusCode())
-        val responseBody = JsonParser.parseString(response.body())
-        return responseBody.asJsonObject.get("id").asString
     }
 
     private fun getRequest(uriPath: String): HttpRequest {
