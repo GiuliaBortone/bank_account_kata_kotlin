@@ -43,7 +43,8 @@ class CreateNewAccountAPITest {
     }
 
     private fun assertValidUUID(value: String?) {
-        assertThat(UUID.fromString(value).version()).withFailMessage("expected UUID version 4, but found $value ")
+        assertThat(UUID.fromString(value).version())
+            .withFailMessage("expected UUID version 4, but found $value")
             .isEqualTo(4)
     }
 }

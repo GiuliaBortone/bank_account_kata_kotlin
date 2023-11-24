@@ -3,6 +3,8 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class BankApp {
@@ -35,7 +37,11 @@ class RouterServlet : HttpServlet() {
 
         if(existingAccountIDs.contains(uuidFromRequest)) {
             resp.status = HttpServletResponse.SC_OK
-            resp.writer.print("""{"balance":0}""")
+            val formattedDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            resp.writer.print("""{
+                "date": "$formattedDate",
+                "balance":0
+            }""")
             return
         }
 

@@ -1,15 +1,13 @@
 import com.google.gson.JsonParser
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -51,10 +49,9 @@ class AccountBalanceAPITest {
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
         assertThat(response.statusCode()).isEqualTo(200)
-        val responseBody = JsonParser.parseString(response.body())
-        val balance = responseBody.asJsonObject.get("balance").asBigDecimal
-        assertEquals(BigDecimal.ZERO, balance)
-        //TODO: assert "date" field
+        val responseBody = JsonParser.parseString(response.body()).asJsonObject
+        assertEquals(BigDecimal.ZERO, responseBody.get("balance").asBigDecimal)
+        assertValidDateTime(responseBody.get("date").asString)
     }
 
     private fun createNewAccount(): String {
@@ -71,5 +68,9 @@ class AccountBalanceAPITest {
         return responseBody.asJsonObject.get("id").asString
     }
 
-
+    private fun assertValidDateTime(value: String) {
+        assertDoesNotThrow {
+            ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        }
+    }
 }
