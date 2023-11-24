@@ -13,6 +13,9 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountBalanceAPITest {
     private val bankApp = BankApp()
+    private val client = HttpClient
+        .newBuilder()
+        .build()
 
     @BeforeAll
     fun setUp() {
@@ -26,11 +29,7 @@ class AccountBalanceAPITest {
 
     @Test
     fun `get the balance of a non existent account returns 404`() {
-        val client = HttpClient.newBuilder().build()
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/accounts/non-existent-uuid/balance"))
-            .GET()
-            .build()
+        val request = getRequest("/accounts/non-existent-uuid/balance")
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
@@ -40,11 +39,7 @@ class AccountBalanceAPITest {
     @Test
     fun `get the balance of a existing account returns 200 and balance to date`() {
         val existingAccountUUID = createNewAccount()
-        val client = HttpClient.newBuilder().build()
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/balance"))
-            .GET()
-            .build()
+        val request = getRequest("/accounts/$existingAccountUUID/balance")
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
@@ -55,7 +50,6 @@ class AccountBalanceAPITest {
     }
 
     private fun createNewAccount(): String {
-        val client = HttpClient.newBuilder().build()
         val request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8080/create-new-account"))
             .POST(HttpRequest.BodyPublishers.noBody())
@@ -66,6 +60,13 @@ class AccountBalanceAPITest {
         assertEquals(201, response.statusCode())
         val responseBody = JsonParser.parseString(response.body())
         return responseBody.asJsonObject.get("id").asString
+    }
+
+    private fun getRequest(uriPath: String): HttpRequest {
+        return HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080$uriPath"))
+            .GET()
+            .build()
     }
 
     private fun assertValidDateTime(value: String) {
