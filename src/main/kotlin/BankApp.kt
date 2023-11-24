@@ -27,7 +27,7 @@ class RouterServlet : HttpServlet() {
         val newAccountID = UUID.randomUUID()
         existingAccountIDs.add(newAccountID.toString())
         resp.status = HttpServletResponse.SC_CREATED
-        resp.writer.print("""{"id": "$newAccountID"}""".trimMargin())
+        resp.writer.print("""{"id": "$newAccountID"}""")
     }
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
