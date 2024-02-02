@@ -57,7 +57,7 @@ class DepositAPITest {
         val existingAccountUUID = createNewAccount(client)
         val request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/deposit"))
-            .POST(BodyPublishers.ofString(""" { "amount": 200 } """))
+            .POST(BodyPublishers.ofString(""" { "amount": 100 } """))
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -71,7 +71,7 @@ class DepositAPITest {
         val nonExistentAccountUUID = UUID.randomUUID()
         val request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8080/accounts/$nonExistentAccountUUID/deposit"))
-            .POST(BodyPublishers.ofString(""" { "amount": 200 } """))
+            .POST(BodyPublishers.ofString(""" { "amount": 100 } """))
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())

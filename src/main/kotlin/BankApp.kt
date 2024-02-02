@@ -1,8 +1,10 @@
+import com.google.gson.JsonParser
 import jakarta.servlet.http.HttpServlet
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
+import java.math.BigDecimal
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -24,6 +26,7 @@ class BankApp {
 class RouterServlet : HttpServlet() {
     private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
     private val existingAccountIDs = mutableListOf<String>()
+    private var accountBalance = BigDecimal.ZERO
 
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         if (req.requestURI == "/create-new-account") {
@@ -41,6 +44,11 @@ class RouterServlet : HttpServlet() {
                 resp.status = HttpServletResponse.SC_NOT_FOUND
                 return
             }
+
+            val requestBody = req.reader.lines().toList().joinToString("\n")
+            val amount = JsonParser.parseString(requestBody).asJsonObject.get("amount").asBigDecimal
+
+            accountBalance += amount
 
             resp.status = HttpServletResponse.SC_ACCEPTED
             return
@@ -63,7 +71,7 @@ class RouterServlet : HttpServlet() {
             resp.writer.print(
                 """{
                     "date": "$formattedDate",
-                    "balance":0
+                    "balance": $accountBalance
                 }"""
             )
             return
