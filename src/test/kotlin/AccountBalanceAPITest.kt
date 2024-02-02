@@ -1,4 +1,5 @@
 import CreateNewAccountAPITest.Companion.createNewAccount
+import DepositAPITest.Companion.depositInto
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -53,7 +54,7 @@ class AccountBalanceAPITest {
     @Test
     fun `get balance after deposit returns updated balance`() {
         val existingAccountUUID = createNewAccount(client)
-        depositInto(existingAccountUUID, 100)
+        depositInto(existingAccountUUID, 100, client)
         val request = getRequest("/accounts/$existingAccountUUID/balance")
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -67,7 +68,7 @@ class AccountBalanceAPITest {
     fun `get balance after deposit in one account should not change balance of second account`() {
         val firstAccountUUID = createNewAccount(client)
         val secondAccountUUID = createNewAccount(client)
-        depositInto(firstAccountUUID, 100)
+        depositInto(firstAccountUUID, 100, client)
 
         val requestFirst = getRequest("/accounts/$firstAccountUUID/balance")
         val responseFirst = client.send(requestFirst, HttpResponse.BodyHandlers.ofString())
@@ -79,17 +80,6 @@ class AccountBalanceAPITest {
         val responseBodySecond = JsonParser.parseString(responseSecond.body()).asJsonObject
         assertEquals(BigDecimal.ZERO, responseBodySecond.get("balance").asBigDecimal)
     }
-
-    private fun depositInto(existingAccountUUID: String, amount: Int) {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/deposit"))
-            .POST(HttpRequest.BodyPublishers.ofString(""" { "amount": $amount } """))
-            .build()
-
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        assertThat(response.statusCode()).isEqualTo(202)
-    }
-
 
     private fun getRequest(uriPath: String): HttpRequest {
         return HttpRequest.newBuilder()

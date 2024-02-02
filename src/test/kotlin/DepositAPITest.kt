@@ -1,4 +1,5 @@
 import CreateNewAccountAPITest.Companion.createNewAccount
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -77,5 +78,17 @@ class DepositAPITest {
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
         assertEquals(404, response.statusCode())
+    }
+
+    companion object {
+        fun depositInto(existingAccountUUID: String, amount: Int, client: HttpClient) {
+            val request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/deposit"))
+                .POST(BodyPublishers.ofString(""" { "amount": $amount } """))
+                .build()
+
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            Assertions.assertThat(response.statusCode()).isEqualTo(202)
+        }
     }
 }
