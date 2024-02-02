@@ -26,10 +26,15 @@ class RouterServlet : HttpServlet() {
     private val existingAccountIDs = mutableListOf<String>()
 
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
-        val newAccountID = UUID.randomUUID()
-        existingAccountIDs.add(newAccountID.toString())
-        resp.status = HttpServletResponse.SC_CREATED
-        resp.writer.print("""{"id": "$newAccountID"}""")
+        if (req.requestURI == "/create-new-account") {
+            val newAccountID = UUID.randomUUID()
+            existingAccountIDs.add(newAccountID.toString())
+            resp.status = HttpServletResponse.SC_CREATED
+            resp.writer.print("""{"id": "$newAccountID"}""")
+            return
+        }
+
+        resp.status = HttpServletResponse.SC_NOT_FOUND
     }
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
