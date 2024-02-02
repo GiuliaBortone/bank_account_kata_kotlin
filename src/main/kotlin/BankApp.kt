@@ -22,7 +22,7 @@ class BankApp {
 }
 
 class RouterServlet : HttpServlet() {
-
+    private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
     private val existingAccountIDs = mutableListOf<String>()
 
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
@@ -38,7 +38,7 @@ class RouterServlet : HttpServlet() {
     }
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
-        if (req.requestURI.matches("/accounts/.+/balance".toRegex())) {
+        if (req.requestURI.matches("/accounts/$uuidRegex/balance".toRegex())) {
             val uuidFromRequest = req.requestURI.split("/")[2]
 
             if (!existingAccountIDs.contains(uuidFromRequest)) {
@@ -50,9 +50,9 @@ class RouterServlet : HttpServlet() {
             val formattedDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             resp.writer.print(
                 """{
-                "date": "$formattedDate",
-                "balance":0
-            }"""
+                    "date": "$formattedDate",
+                    "balance":0
+                }"""
             )
             return
         }
