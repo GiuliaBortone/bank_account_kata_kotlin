@@ -35,6 +35,13 @@ class RouterServlet : HttpServlet() {
         }
 
         if (req.requestURI.matches("/accounts/$uuidRegex/deposit".toRegex())) {
+            val uuidFromRequest = req.requestURI.split("/")[2]
+
+            if (!existingAccountIDs.contains(uuidFromRequest)) {
+                resp.status = HttpServletResponse.SC_NOT_FOUND
+                return
+            }
+
             resp.status = HttpServletResponse.SC_ACCEPTED
             return
         }

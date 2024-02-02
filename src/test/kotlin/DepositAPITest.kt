@@ -1,5 +1,4 @@
 import CreateNewAccountAPITest.Companion.createNewAccount
-import com.google.gson.JsonParser
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -9,7 +8,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpRequest.BodyPublishers
 import java.net.http.HttpResponse
-import kotlin.test.Ignore
+import java.util.*
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -65,5 +64,18 @@ class DepositAPITest {
 
         assertEquals(202, response.statusCode())
         assertEquals("", response.body())
+    }
+
+    @Test
+    fun `deposit in a non existing account returns 404`() {
+        val nonExistentAccountUUID = UUID.randomUUID()
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/accounts/$nonExistentAccountUUID/deposit"))
+            .POST(BodyPublishers.ofString(""" { "amount": 200 } """))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals(404, response.statusCode())
     }
 }
