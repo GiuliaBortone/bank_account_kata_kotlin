@@ -25,13 +25,12 @@ class BankApp {
 
 class RouterServlet : HttpServlet() {
     private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
-    private val existingAccountIDs = mutableListOf<String>()
-    private var accountBalance = BigDecimal.ZERO
+    private val accountBalances = mutableMapOf<String, BigDecimal>()
 
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         if (req.requestURI == "/create-new-account") {
             val newAccountID = UUID.randomUUID()
-            existingAccountIDs.add(newAccountID.toString())
+            accountBalances[newAccountID.toString()] = BigDecimal.ZERO
             resp.status = HttpServletResponse.SC_CREATED
             resp.writer.print("""{"id": "$newAccountID"}""")
             return
@@ -40,7 +39,7 @@ class RouterServlet : HttpServlet() {
         if (req.requestURI.matches("/accounts/$uuidRegex/deposit".toRegex())) {
             val uuidFromRequest = req.requestURI.split("/")[2]
 
-            if (!existingAccountIDs.contains(uuidFromRequest)) {
+            if (!accountBalances.containsKey(uuidFromRequest)) {
                 resp.status = HttpServletResponse.SC_NOT_FOUND
                 return
             }
@@ -48,7 +47,7 @@ class RouterServlet : HttpServlet() {
             val requestBody = req.reader.lines().toList().joinToString("\n")
             val amount = JsonParser.parseString(requestBody).asJsonObject.get("amount").asBigDecimal
 
-            accountBalance += amount
+            accountBalances[uuidFromRequest] = accountBalances[uuidFromRequest]!! + amount
 
             resp.status = HttpServletResponse.SC_ACCEPTED
             return
@@ -61,7 +60,7 @@ class RouterServlet : HttpServlet() {
         if (req.requestURI.matches("/accounts/$uuidRegex/balance".toRegex())) {
             val uuidFromRequest = req.requestURI.split("/")[2]
 
-            if (!existingAccountIDs.contains(uuidFromRequest)) {
+            if (!accountBalances.containsKey(uuidFromRequest)) {
                 resp.status = HttpServletResponse.SC_NOT_FOUND
                 return
             }
@@ -71,7 +70,7 @@ class RouterServlet : HttpServlet() {
             resp.writer.print(
                 """{
                     "date": "$formattedDate",
-                    "balance": $accountBalance
+                    "balance": ${accountBalances[uuidFromRequest]}
                 }"""
             )
             return

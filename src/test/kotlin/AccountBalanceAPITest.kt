@@ -63,6 +63,23 @@ class AccountBalanceAPITest {
         assertEquals(BigDecimal(100), responseBody.get("balance").asBigDecimal)
     }
 
+    @Test
+    fun `get balance after deposit in one account should not change balance of second account`() {
+        val firstAccountUUID = createNewAccount(client)
+        val secondAccountUUID = createNewAccount(client)
+        depositInto(firstAccountUUID, 100)
+
+        val requestFirst = getRequest("/accounts/$firstAccountUUID/balance")
+        val responseFirst = client.send(requestFirst, HttpResponse.BodyHandlers.ofString())
+        val responseBodyFirst = JsonParser.parseString(responseFirst.body()).asJsonObject
+        assertEquals(BigDecimal(100), responseBodyFirst.get("balance").asBigDecimal)
+
+        val requestSecond = getRequest("/accounts/$secondAccountUUID/balance")
+        val responseSecond = client.send(requestSecond, HttpResponse.BodyHandlers.ofString())
+        val responseBodySecond = JsonParser.parseString(responseSecond.body()).asJsonObject
+        assertEquals(BigDecimal.ZERO, responseBodySecond.get("balance").asBigDecimal)
+    }
+
     private fun depositInto(existingAccountUUID: String, amount: Int) {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/deposit"))
