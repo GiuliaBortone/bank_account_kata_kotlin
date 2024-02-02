@@ -35,16 +35,18 @@ class RouterServlet : HttpServlet() {
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         val uuidFromRequest = req.requestURI.split("/")[2]
 
-        if(existingAccountIDs.contains(uuidFromRequest)) {
-            resp.status = HttpServletResponse.SC_OK
-            val formattedDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-            resp.writer.print("""{
-                "date": "$formattedDate",
-                "balance":0
-            }""")
+        if (!existingAccountIDs.contains(uuidFromRequest)) {
+            resp.status = HttpServletResponse.SC_NOT_FOUND
             return
         }
 
-        resp.status = HttpServletResponse.SC_NOT_FOUND
+        resp.status = HttpServletResponse.SC_OK
+        val formattedDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        resp.writer.print(
+            """{
+                "date": "$formattedDate",
+                "balance":0
+            }"""
+        )
     }
 }
