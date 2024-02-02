@@ -34,6 +34,11 @@ class RouterServlet : HttpServlet() {
             return
         }
 
+        if (req.requestURI.matches("/accounts/$uuidRegex/deposit".toRegex())) {
+            resp.status = HttpServletResponse.SC_ACCEPTED
+            return
+        }
+
         resp.status = HttpServletResponse.SC_NOT_FOUND
     }
 

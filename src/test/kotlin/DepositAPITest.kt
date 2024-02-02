@@ -53,7 +53,6 @@ class DepositAPITest {
         assertEquals(404, response.statusCode())
     }
 
-    @Ignore
     @Test
     fun `deposit of a existing account returns 202 and empty body`() {
         val existingAccountUUID = createNewAccount(client)
@@ -67,13 +66,4 @@ class DepositAPITest {
         assertEquals(202, response.statusCode())
         assertEquals("", response.body())
     }
-
-
-
-
-
-
-
-
-
 }
