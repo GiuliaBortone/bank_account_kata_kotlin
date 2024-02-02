@@ -41,6 +41,18 @@ class DepositAPITest {
         assertEquals(404, response.statusCode())
     }
 
+    @Test
+    fun `non existing GET route returns 404`() {
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/non-existing"))
+            .GET()
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals(404, response.statusCode())
+    }
+
     @Ignore
     @Test
     fun `deposit of a existing account returns 202 and empty body`() {
