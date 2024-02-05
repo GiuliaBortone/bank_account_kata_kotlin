@@ -1,4 +1,3 @@
-import com.google.gson.JsonParser
 import jakarta.servlet.http.HttpServlet
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -6,10 +5,10 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import repositories.BankRepository
 import repositories.InMemoryBankRepository
-import java.math.BigDecimal
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
+import routes.BalanceRoute
+import routes.CreateNewAccountRoute
+import routes.DepositRoute
+import routes.Route
 
 class BankApp {
     private val server = Server(8080)
@@ -26,61 +25,49 @@ class BankApp {
 }
 
 class RouterServlet : HttpServlet() {
-    private val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
     private val bankRepository: BankRepository = InMemoryBankRepository()
 
-    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
-        if (req.requestURI == "/create-new-account") {
-            val newAccountID = bankRepository.createAccount()
-            resp.status = HttpServletResponse.SC_CREATED
-            resp.writer.print("""{"id": "$newAccountID"}""")
+    override fun service(req: HttpServletRequest, resp: HttpServletResponse) {
+        val requestURI = req.requestURI
+        val route = chooseRoute(requestURI)
+
+        if (route == null) {
+            resp.status = HttpServletResponse.SC_NOT_FOUND
             return
         }
 
-        if (req.requestURI.matches("/accounts/$uuidRegex/deposit".toRegex())) {
-            val uuidFromRequest = req.requestURI.split("/")[2]
-            val accountUUID = UUID.fromString(uuidFromRequest)
-
-            if (!bankRepository.accountExists(accountUUID)) {
-                resp.status = HttpServletResponse.SC_NOT_FOUND
+        when (req.method) {
+            "GET" -> {
+                route.handleGet(req, resp, bankRepository)
                 return
             }
 
-            val requestBody = req.reader.lines().toList().joinToString("\n")
-            val amount = JsonParser.parseString(requestBody).asJsonObject.get("amount").asBigDecimal
+            "POST" -> {
+                route.handlePost(req, resp, bankRepository)
+                return
+            }
 
-            bankRepository.depositInto(accountUUID, amount)
-
-            resp.status = HttpServletResponse.SC_ACCEPTED
-            return
+            else -> {
+                resp.status = HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            }
         }
-
-        resp.status = HttpServletResponse.SC_NOT_FOUND
     }
 
-    override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
-        if (req.requestURI.matches("/accounts/$uuidRegex/balance".toRegex())) {
-            val uuidFromRequest = req.requestURI.split("/")[2]
-            val accountUUID = UUID.fromString(uuidFromRequest)
+    private fun chooseRoute(requestURI: String): Route? {
+       val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
 
-            if (!bankRepository.accountExists(accountUUID)) {
-                resp.status = HttpServletResponse.SC_NOT_FOUND
-                return
-            }
-
-            resp.status = HttpServletResponse.SC_OK
-            val formattedDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-            val accountBalance = bankRepository.balanceFor(accountUUID)
-
-            resp.writer.print(
-                """{
-                    "date": "$formattedDate",
-                    "balance": $accountBalance
-                }"""
-            )
-            return
+        if (requestURI == "/create-new-account") {
+            return CreateNewAccountRoute()
         }
 
-        resp.status = HttpServletResponse.SC_NOT_FOUND
+        if (requestURI.matches("/accounts/$uuidRegex/deposit".toRegex())) {
+            return DepositRoute()
+        }
+
+        if (requestURI.matches("/accounts/$uuidRegex/balance".toRegex())) {
+            return BalanceRoute()
+        }
+
+        return null
     }
 }

@@ -30,6 +30,19 @@ class AccountBalanceAPITest {
     }
 
     @Test
+    fun `POST not allowed for balance`() {
+        val existingAccountUUID = createNewAccount(client)
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/balance"))
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals(405, response.statusCode())
+    }
+
+    @Test
     fun `get the balance of a non existent account returns 404`() {
         val request = getRequest("/accounts/non-existent-uuid/balance")
 

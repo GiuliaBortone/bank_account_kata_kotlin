@@ -30,27 +30,16 @@ class DepositAPITest {
     }
 
     @Test
-    fun `non existing POST route returns 404`() {
+    fun `GET is not allowed for deposit`() {
+        val existingAccountUUID = createNewAccount(client)
         val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/non-existing"))
-            .POST(BodyPublishers.noBody())
-            .build()
-
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        assertEquals(404, response.statusCode())
-    }
-
-    @Test
-    fun `non existing GET route returns 404`() {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/non-existing"))
+            .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/deposit"))
             .GET()
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        assertEquals(404, response.statusCode())
+        assertEquals(405, response.statusCode())
     }
 
     @Test

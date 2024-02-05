@@ -27,6 +27,19 @@ class CreateNewAccountAPITest {
     }
 
     @Test
+    fun `GET is not allowed for createNewAccount`() {
+        val client = HttpClient.newBuilder().build()
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/create-new-account"))
+            .GET()
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals(405, response.statusCode())
+    }
+
+    @Test
     fun `POST empty request should return 201 and valid account ID`() {
         // arrange
         val client = HttpClient.newBuilder().build()
