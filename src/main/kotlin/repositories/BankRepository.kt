@@ -8,4 +8,5 @@ interface BankRepository {
     fun accountExists(accountUUID: UUID): Boolean
     fun depositInto(accountUUID: UUID, amount: BigDecimal)
     fun balanceFor(accountUUID: UUID): BigDecimal
+    fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean
 }

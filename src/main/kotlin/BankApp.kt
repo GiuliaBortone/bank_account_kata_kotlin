@@ -5,10 +5,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import repositories.BankRepository
 import repositories.InMemoryBankRepository
-import routes.BalanceRoute
-import routes.CreateNewAccountRoute
-import routes.DepositRoute
-import routes.Route
+import routes.*
 
 class BankApp {
     private val server = Server(8080)
@@ -66,6 +63,10 @@ class RouterServlet : HttpServlet() {
 
         if (requestURI.matches("/accounts/$uuidRegex/balance".toRegex())) {
             return BalanceRoute()
+        }
+
+        if (requestURI.matches("/accounts/$uuidRegex/withdraw".toRegex())) {
+            return WithdrawRoute()
         }
 
         return null

@@ -43,7 +43,7 @@ class DepositAPITest {
     }
 
     @Test
-    fun `deposit of a existing account returns 202 and empty body`() {
+    fun `deposit in an existing account returns 202 and empty body`() {
         val existingAccountUUID = createNewAccount(client)
         val request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8080/accounts/$existingAccountUUID/deposit"))

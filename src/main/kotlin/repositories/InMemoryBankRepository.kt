@@ -24,4 +24,13 @@ class InMemoryBankRepository : BankRepository {
     override fun balanceFor(accountUUID: UUID): BigDecimal {
         return accountBalances[accountUUID]!!
     }
+
+    override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {
+        if (accountBalances[accountUUID]!! < amount) {
+            return false
+        }
+
+        accountBalances[accountUUID] = accountBalances[accountUUID]!! - amount
+        return true
+    }
 }
