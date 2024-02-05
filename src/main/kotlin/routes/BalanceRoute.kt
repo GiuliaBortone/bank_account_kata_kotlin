@@ -5,17 +5,12 @@ import jakarta.servlet.http.HttpServletResponse
 import repositories.BankRepository
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 class BalanceRoute: Route() {
     override fun handleGet(req: HttpServletRequest, resp: HttpServletResponse, bankRepository: BankRepository) {
-        val uuidFromRequest = req.requestURI.split("/")[2]
-        val accountUUID = UUID.fromString(uuidFromRequest)
+        val accountUUID = accountUUIDIfAccountExists(req, resp, bankRepository)
 
-        if (!bankRepository.accountExists(accountUUID)) {
-            resp.status = HttpServletResponse.SC_NOT_FOUND
-            return
-        }
+        if (accountUUID == null) return
 
         resp.status = HttpServletResponse.SC_OK
         val formattedDate = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
