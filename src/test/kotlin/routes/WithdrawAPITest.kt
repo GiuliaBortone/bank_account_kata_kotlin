@@ -1,5 +1,8 @@
-import CreateNewAccountAPITest.Companion.createNewAccount
-import DepositAPITest.Companion.depositInto
+package routes
+
+import BankApp
+import routes.CreateNewAccountAPITest.Companion.createNewAccount
+import routes.DepositAPITest.Companion.depositInto
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

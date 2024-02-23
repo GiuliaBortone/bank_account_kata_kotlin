@@ -1,3 +1,6 @@
+package routes
+
+import BankApp
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll

@@ -1,5 +1,8 @@
-import CreateNewAccountAPITest.Companion.createNewAccount
-import DepositAPITest.Companion.depositInto
+package routes
+
+import BankApp
+import routes.CreateNewAccountAPITest.Companion.createNewAccount
+import routes.DepositAPITest.Companion.depositInto
 import com.google.gson.JsonParser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*

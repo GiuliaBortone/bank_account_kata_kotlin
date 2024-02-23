@@ -1,4 +1,7 @@
-import CreateNewAccountAPITest.Companion.createNewAccount
+package routes
+
+import BankApp
+import routes.CreateNewAccountAPITest.Companion.createNewAccount
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
