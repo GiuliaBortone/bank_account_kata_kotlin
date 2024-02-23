@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.util.*
+import kotlin.test.Ignore
 
+// TODO: this tests can be executed only if a ready database
+//  with created db schema is up and running on localhost
 class DatabaseBankRepositoryTest {
 
     private val repository = DatabaseBankRepository()
@@ -25,6 +28,13 @@ class DatabaseBankRepositoryTest {
     fun `check account exists for a non existing account`() {
         val nonExistingAccountUUID = UUID.randomUUID()
         assertThat(repository.accountExists(nonExistingAccountUUID)).isFalse()
+    }
+
+    @Ignore
+    @Test
+    fun `check account exists after creation`() {
+        val existingAccountUUID = repository.createAccount()
+        assertThat(repository.accountExists(existingAccountUUID)).isTrue()
     }
 
 }
