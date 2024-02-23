@@ -9,7 +9,7 @@ class DatabaseBankRepository : BankRepository {
     }
 
     override fun accountExists(accountUUID: UUID): Boolean {
-        TODO("Not yet implemented")
+        return false
     }
 
     override fun depositInto(accountUUID: UUID, amount: BigDecimal) {

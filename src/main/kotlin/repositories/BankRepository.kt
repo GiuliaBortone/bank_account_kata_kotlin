@@ -11,5 +11,4 @@ interface BankRepository {
     fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean
 }
 
-
 class NonExistingAccountException(accountUUID: UUID) : Exception("Account with $accountUUID does not exist")
