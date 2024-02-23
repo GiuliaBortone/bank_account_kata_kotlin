@@ -15,12 +15,13 @@ class DatabaseBankRepository : BankRepository {
     }
 
     override fun accountExists(accountUUID: UUID): Boolean {
-        val conn: Connection = DriverManager.getConnection(url)
-        val query = conn.prepareStatement("SELECT COUNT(*) FROM bank_account WHERE id = '$accountUUID'")
-        val result = query.executeQuery()
-        result.next()
-        val foundAccountSize = result.getInt(1)
-        return foundAccountSize == 1;
+        val conn = openConnection()
+        val query = conn.prepareStatement("SELECT COUNT(*) FROM bank_account WHERE id = ?")
+        query.setObject(1, accountUUID)
+
+        val result = query.executeQuery().apply { next() }
+        val foundAccount = result.getInt(1)
+        return foundAccount == 1;
     }
 
     override fun depositInto(accountUUID: UUID, amount: BigDecimal) {
@@ -34,4 +35,6 @@ class DatabaseBankRepository : BankRepository {
     override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {
         TODO("Not yet implemented")
     }
+
+    private fun openConnection(): Connection = DriverManager.getConnection(url)
 }
