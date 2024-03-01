@@ -8,7 +8,11 @@ import java.util.*
 
 class DatabaseBankRepository : BankRepository {
 
-    private val url = "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=mysecretpassword"
+    private val jdbcConnectionUrl: String
+
+    constructor(host: String, port: Int, dbName: String, user: String, password: String) {
+        this.jdbcConnectionUrl = "jdbc:postgresql://$host:$port/$dbName?user=$user&password=$password"
+    }
 
     override fun createAccount(): UUID {
         val newAccountUUID = UUID.randomUUID()
@@ -44,5 +48,5 @@ class DatabaseBankRepository : BankRepository {
         TODO("Not yet implemented")
     }
 
-    private fun openConnection(): Connection = DriverManager.getConnection(url)
+    private fun openConnection(): Connection = DriverManager.getConnection(jdbcConnectionUrl)
 }
