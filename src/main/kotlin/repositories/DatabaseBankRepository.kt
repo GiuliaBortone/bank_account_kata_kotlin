@@ -18,18 +18,24 @@ class DatabaseBankRepository : BankRepository {
         val newAccountUUID = UUID.randomUUID()
 
         val connection = openConnection()
-        val query = connection.prepareStatement("INSERT INTO bank_account (id, balance) VALUES (?, ?)")
-        query.setObject(1, newAccountUUID)
-        query.setBigDecimal(2, BigDecimal.ZERO)
-        query.executeUpdate()
+        val query = connection
+            .prepareStatement("INSERT INTO bank_account (id, balance) VALUES (?, ?)")
+            .apply {
+                setObject(1, newAccountUUID)
+                setBigDecimal(2, BigDecimal.ZERO)
+             }
 
+        query.executeUpdate()
         return newAccountUUID
     }
 
     override fun accountExists(accountUUID: UUID): Boolean {
         val connection = openConnection()
-        val query = connection.prepareStatement("SELECT COUNT(*) as foundAccounts FROM bank_account WHERE id = ?")
-        query.setObject(1, accountUUID)
+        val query = connection
+            .prepareStatement("SELECT COUNT(*) as foundAccounts FROM bank_account WHERE id = ?")
+            .apply {
+                setObject(1, accountUUID)
+             }
 
         val result = query.executeQuery().apply { next() }
         return result.getInt("foundAccounts") == 1
