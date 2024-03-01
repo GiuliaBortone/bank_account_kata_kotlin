@@ -34,17 +34,6 @@ class DatabaseBankRepositoryTest {
     }
 
     @Test
-    fun `deposit into a non existing account`() {
-        val nonExistingAccountUUID = UUID.fromString("10fea0c2-0bc6-4ebe-9f05-ee3bdfe99809")
-
-        val thrownException = assertThrows<NonExistingAccountException> {
-            repository.depositInto(nonExistingAccountUUID, BigDecimal(100))
-        }
-
-        assertThat(thrownException).hasMessage("Account with 10fea0c2-0bc6-4ebe-9f05-ee3bdfe99809 does not exist")
-    }
-
-    @Test
     fun `check account exists for a non existing account`() {
         val nonExistingAccountUUID = UUID.randomUUID()
         assertThat(repository.accountExists(nonExistingAccountUUID)).isFalse()
@@ -54,6 +43,27 @@ class DatabaseBankRepositoryTest {
     fun `check account exists after creation`() {
         val existingAccountUUID = repository.createAccount()
         assertThat(repository.accountExists(existingAccountUUID)).isTrue()
+    }
+
+    @Test
+    fun `check balance for a non existing account`() {
+        val nonExistingAccountUUID = UUID.fromString("042cd801-b941-4ec1-8cd6-e1887023fd72")
+        val thrownException = assertThrows<NonExistingAccountException> {
+            repository.balanceFor(nonExistingAccountUUID)
+        }
+
+        assertThat(thrownException).hasMessage("Account with 042cd801-b941-4ec1-8cd6-e1887023fd72 does not exist")
+    }
+
+    @Test
+    fun `deposit into a non existing account`() {
+        val nonExistingAccountUUID = UUID.fromString("10fea0c2-0bc6-4ebe-9f05-ee3bdfe99809")
+
+        val thrownException = assertThrows<NonExistingAccountException> {
+            repository.depositInto(nonExistingAccountUUID, BigDecimal(100))
+        }
+
+        assertThat(thrownException).hasMessage("Account with 10fea0c2-0bc6-4ebe-9f05-ee3bdfe99809 does not exist")
     }
 
 }

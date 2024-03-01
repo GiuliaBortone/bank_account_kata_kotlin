@@ -41,7 +41,7 @@ class DatabaseBankRepository : BankRepository {
     }
 
     override fun balanceFor(accountUUID: UUID): BigDecimal {
-        TODO("Not yet implemented")
+        throw NonExistingAccountException(accountUUID)
     }
 
     override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {
