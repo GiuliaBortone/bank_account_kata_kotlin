@@ -1,15 +1,31 @@
 package repositories
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
+import java.sql.DriverManager
 import java.util.*
 import kotlin.test.Ignore
 
 // TODO: this tests can be executed only if a ready database
 //  with created db schema is up and running on localhost
 class DatabaseBankRepositoryTest {
+
+    @BeforeEach
+    fun setUp() {
+        val url = "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=mysecretpassword"
+        val connection = DriverManager.getConnection(url)
+        val databaseSchema = """CREATE TABLE IF NOT EXISTS BANK_ACCOUNT (
+                                id uuid PRIMARY KEY NOT NULL,
+                                balance numeric NOT NULL
+                                )
+                             """
+
+        val query = connection.prepareStatement(databaseSchema)
+        query.execute()
+    }
 
     private val repository = DatabaseBankRepository()
 

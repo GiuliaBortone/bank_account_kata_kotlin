@@ -21,7 +21,7 @@ class DatabaseBankRepository : BankRepository {
 
         val result = query.executeQuery().apply { next() }
         val foundAccount = result.getInt(1)
-        return foundAccount == 1;
+        return foundAccount == 1
     }
 
     override fun depositInto(accountUUID: UUID, amount: BigDecimal) {
