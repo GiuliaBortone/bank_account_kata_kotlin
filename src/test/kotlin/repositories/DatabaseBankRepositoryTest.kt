@@ -46,7 +46,6 @@ class DatabaseBankRepositoryTest {
         assertThat(repository.accountExists(nonExistingAccountUUID)).isFalse()
     }
 
-    @Ignore
     @Test
     fun `check account exists after creation`() {
         val existingAccountUUID = repository.createAccount()

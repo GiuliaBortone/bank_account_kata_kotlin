@@ -11,12 +11,20 @@ class DatabaseBankRepository : BankRepository {
     private val url = "jdbc:postgresql://localhost:5432/postgres?user=postgres&password=mysecretpassword"
 
     override fun createAccount(): UUID {
-        return UUID.randomUUID()
+        val newAccountUUID = UUID.randomUUID()
+
+        val connection = openConnection()
+        val query = connection.prepareStatement("INSERT INTO bank_account (id, balance) VALUES (?, ?)")
+        query.setObject(1, newAccountUUID)
+        query.setBigDecimal(2, BigDecimal.ZERO)
+        query.executeUpdate()
+
+        return newAccountUUID
     }
 
     override fun accountExists(accountUUID: UUID): Boolean {
-        val conn = openConnection()
-        val query = conn.prepareStatement("SELECT COUNT(*) FROM bank_account WHERE id = ?")
+        val connection = openConnection()
+        val query = connection.prepareStatement("SELECT COUNT(*) FROM bank_account WHERE id = ?")
         query.setObject(1, accountUUID)
 
         val result = query.executeQuery().apply { next() }
