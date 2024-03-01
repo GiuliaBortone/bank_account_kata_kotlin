@@ -28,12 +28,11 @@ class DatabaseBankRepository : BankRepository {
 
     override fun accountExists(accountUUID: UUID): Boolean {
         val connection = openConnection()
-        val query = connection.prepareStatement("SELECT COUNT(*) FROM bank_account WHERE id = ?")
+        val query = connection.prepareStatement("SELECT COUNT(*) as foundAccounts FROM bank_account WHERE id = ?")
         query.setObject(1, accountUUID)
 
         val result = query.executeQuery().apply { next() }
-        val foundAccount = result.getInt(1)
-        return foundAccount == 1
+        return result.getInt("foundAccounts") == 1
     }
 
     override fun depositInto(accountUUID: UUID, amount: BigDecimal) {
