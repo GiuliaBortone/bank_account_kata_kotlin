@@ -46,7 +46,15 @@ class DatabaseBankRepository : BankRepository {
     }
 
     override fun balanceFor(accountUUID: UUID): BigDecimal {
-        throw NonExistingAccountException(accountUUID)
+        val connection = openConnection()
+        val query = connection.prepareStatement("SELECT * FROM bank_account WHERE id = ?")
+        query.setObject(1, accountUUID)
+
+        val resultSet = query.executeQuery()
+        if (!resultSet.next())
+            throw NonExistingAccountException(accountUUID)
+
+        return BigDecimal.ZERO
     }
 
     override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {

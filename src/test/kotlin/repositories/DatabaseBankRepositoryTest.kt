@@ -56,6 +56,13 @@ class DatabaseBankRepositoryTest {
     }
 
     @Test
+    fun `check balance for a new account`() {
+        val existingAccountUUID = repository.createAccount()
+        val balance = repository.balanceFor(existingAccountUUID)
+        assertThat(balance).isZero()
+    }
+
+    @Test
     fun `deposit into a non existing account`() {
         val nonExistingAccountUUID = UUID.fromString("10fea0c2-0bc6-4ebe-9f05-ee3bdfe99809")
 
