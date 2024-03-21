@@ -1,6 +1,7 @@
 package repositories
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -22,15 +23,17 @@ class DatabaseBankRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        val jdbcConnectionUrl = "jdbc:postgresql://$host:$port/$dbName?user=$user&password=$password"
-        val connection = DriverManager.getConnection(jdbcConnectionUrl)
         val databaseSchema = """CREATE TABLE IF NOT EXISTS BANK_ACCOUNT (
                                 id uuid PRIMARY KEY NOT NULL,
                                 balance numeric NOT NULL
                              )"""
 
-        val query = connection.prepareStatement(databaseSchema)
-        query.execute()
+        executeStatement(databaseSchema)
+    }
+
+    @AfterEach
+    fun emptyDatabase() {
+        executeStatement("TRUNCATE TABLE bank_account")
     }
 
     @Test
@@ -91,5 +94,13 @@ class DatabaseBankRepositoryTest {
         val balance = repository.balanceFor(existingAccountUUID)
 
         assertThat(balance).isEqualTo(BigDecimal(100 + 200))
+    }
+
+    private fun executeStatement(statement: String) {
+        val jdbcConnectionUrl = "jdbc:postgresql://$host:$port/$dbName?user=$user&password=$password"
+        val connection = DriverManager.getConnection(jdbcConnectionUrl)
+
+        val query = connection.prepareStatement(statement)
+        query.execute()
     }
 }
