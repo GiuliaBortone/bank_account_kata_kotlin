@@ -83,4 +83,13 @@ class DatabaseBankRepositoryTest {
         assertThat(thrownException).hasMessage("Account with 10fea0c2-0bc6-4ebe-9f05-ee3bdfe99809 does not exist")
     }
 
+    @Test
+    fun `deposit two times into same account`() {
+        val existingAccountUUID = repository.createAccount()
+        repository.depositInto(existingAccountUUID, BigDecimal(100))
+        repository.depositInto(existingAccountUUID, BigDecimal(200))
+        val balance = repository.balanceFor(existingAccountUUID)
+
+        assertThat(balance).isEqualTo(BigDecimal(100 + 200))
+    }
 }

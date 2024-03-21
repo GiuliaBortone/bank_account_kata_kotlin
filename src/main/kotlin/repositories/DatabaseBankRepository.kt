@@ -44,7 +44,7 @@ class DatabaseBankRepository : BankRepository {
     override fun depositInto(accountUUID: UUID, amount: BigDecimal) {
         val connection = openConnection()
         val query = connection
-            .prepareStatement("UPDATE bank_account SET balance = ? WHERE id = ?")
+            .prepareStatement("UPDATE bank_account SET balance = (balance + ?) WHERE id = ?")
             .apply {
                 setBigDecimal(1, amount)
                 setObject(2, accountUUID)
