@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.io.File
 import java.math.BigDecimal
 import java.sql.DriverManager
 import java.util.*
@@ -23,10 +24,7 @@ class DatabaseBankRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        val databaseSchema = """CREATE TABLE IF NOT EXISTS BANK_ACCOUNT (
-                                id uuid PRIMARY KEY NOT NULL,
-                                balance numeric NOT NULL
-                             )"""
+        val databaseSchema = File("src/main/resources/database_schema.sql").readText()
 
         executeStatement(databaseSchema)
     }
