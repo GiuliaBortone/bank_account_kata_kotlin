@@ -59,7 +59,17 @@ class DatabaseBankRepositoryTest {
     fun `check balance for a new account`() {
         val existingAccountUUID = repository.createAccount()
         val balance = repository.balanceFor(existingAccountUUID)
+
         assertThat(balance).isZero()
+    }
+
+    @Test
+    fun `check balance for an account with deposited money`() {
+        val existingAccountUUID = repository.createAccount()
+        repository.depositInto(existingAccountUUID, BigDecimal(100))
+        val balance = repository.balanceFor(existingAccountUUID)
+
+        assertThat(balance).isEqualTo(BigDecimal(100))
     }
 
     @Test
