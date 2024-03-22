@@ -1,38 +1,50 @@
 package repositories
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.io.File
 import java.math.BigDecimal
 import java.sql.DriverManager
 import java.util.*
 
-// TODO: this tests can be executed only if a ready database
-//  with created db schema is up and running on localhost
+// this tests can be executed only if a ready
+// postgresql instance is up and running on localhost
 class DatabaseBankRepositoryTest {
 
-    private val host = "localhost"
-    private val port = 5432
-    private val dbName = "postgres"
-    private val user = "postgres"
-    private val password = "mysecretpassword"
+    companion object {
+        private const val HOST = "localhost"
+        private const val PORT = 5432
+        private const val DB_NAME = "postgres"
+        private const val DB_USER = "postgres"
+        private const val DB_PASSWORD = "mysecretpassword"
 
-    private val repository = DatabaseBankRepository(host, port, dbName, user, password)
+        @JvmStatic
+        @BeforeAll
+        fun createDatabaseSchema() {
+            val databaseSchemaFileContent = readFileFromResources("database_schema.sql")
+            executeStatement(databaseSchemaFileContent)
+        }
+
+        private fun executeStatement(statement: String) {
+            val jdbcConnectionUrl = "jdbc:postgresql://$HOST:$PORT/$DB_NAME?user=$DB_USER&password=$DB_PASSWORD"
+            val connection = DriverManager.getConnection(jdbcConnectionUrl)
+            val query = connection.prepareStatement(statement)
+            query.execute()
+        }
+
+        private fun readFileFromResources(resourceFilepath: String) =
+            Companion::class.java.classLoader.getResource(resourceFilepath)!!.readText()
+
+    }
 
     @BeforeEach
     fun setUp() {
-        val databaseSchema = File("src/main/resources/database_schema.sql").readText()
-
-        executeStatement(databaseSchema)
-    }
-
-    @AfterEach
-    fun emptyDatabase() {
         executeStatement("TRUNCATE TABLE bank_account")
     }
+
+    private val repository = DatabaseBankRepository(HOST, PORT, DB_NAME, DB_USER, DB_PASSWORD)
 
     @Test
     fun `check account exists for a non existing account`() {
@@ -92,13 +104,5 @@ class DatabaseBankRepositoryTest {
         val balance = repository.balanceFor(existingAccountUUID)
 
         assertThat(balance).isEqualTo(BigDecimal(100 + 200))
-    }
-
-    private fun executeStatement(statement: String) {
-        val jdbcConnectionUrl = "jdbc:postgresql://$host:$port/$dbName?user=$user&password=$password"
-        val connection = DriverManager.getConnection(jdbcConnectionUrl)
-
-        val query = connection.prepareStatement(statement)
-        query.execute()
     }
 }
