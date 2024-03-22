@@ -26,7 +26,7 @@ open class Route {
         return accountUUID
     }
 
-    private fun extractUUID(req: HttpServletRequest): UUID {
+    fun extractUUID(req: HttpServletRequest): UUID {
         val uuidFromRequest = req.requestURI.split("/")[2]
         return UUID.fromString(uuidFromRequest)
     }

@@ -61,7 +61,7 @@ class DatabaseBankRepository : BankRepository {
         return resultSet.getBigDecimal("balance")
     }
 
-    override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {
+    override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal) {
         val balance = balanceFor(accountUUID)
 
         if (balance < amount) {
@@ -70,8 +70,6 @@ class DatabaseBankRepository : BankRepository {
 
         openConnection()
             .executeUpdate("UPDATE bank_account SET balance = (balance - ?) WHERE id = ?", amount, accountUUID)
-
-        return true
     }
 
     private fun openConnection(): Connection = DriverManager.getConnection(jdbcConnectionUrl)

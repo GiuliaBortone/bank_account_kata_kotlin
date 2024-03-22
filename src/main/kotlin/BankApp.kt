@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import repositories.BankRepository
-import repositories.InMemoryBankRepository
+import repositories.DatabaseBankRepository
 import routes.*
 
 class BankApp {
@@ -22,7 +22,13 @@ class BankApp {
 }
 
 class RouterServlet : HttpServlet() {
-    private val bankRepository: BankRepository = InMemoryBankRepository()
+    private val bankRepository: BankRepository = DatabaseBankRepository(
+        host = "localhost",
+        port = 5432,
+        dbName = "postgres",
+        user = "postgres",
+        password = "mysecretpassword"
+    )
 
     override fun service(req: HttpServletRequest, resp: HttpServletResponse) {
         val requestURI = req.requestURI
@@ -51,7 +57,7 @@ class RouterServlet : HttpServlet() {
     }
 
     private fun chooseRoute(requestURI: String): Route? {
-       val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
+        val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex()
 
         if (requestURI == "/create-new-account") {
             return CreateNewAccountRoute()
