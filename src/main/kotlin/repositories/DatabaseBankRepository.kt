@@ -23,7 +23,7 @@ class DatabaseBankRepository : BankRepository {
             .apply {
                 setObject(1, newAccountUUID)
                 setBigDecimal(2, BigDecimal.ZERO)
-             }
+            }
 
         query.executeUpdate()
         return newAccountUUID
@@ -35,22 +35,15 @@ class DatabaseBankRepository : BankRepository {
             .prepareStatement("SELECT COUNT(*) as foundAccounts FROM bank_account WHERE id = ?")
             .apply {
                 setObject(1, accountUUID)
-             }
+            }
 
         val result = query.executeQuery().apply { next() }
         return result.getInt("foundAccounts") == 1
     }
 
     override fun depositInto(accountUUID: UUID, amount: BigDecimal) {
-        val connection = openConnection()
-        val query = connection
-            .prepareStatement("UPDATE bank_account SET balance = (balance + ?) WHERE id = ?")
-            .apply {
-                setBigDecimal(1, amount)
-                setObject(2, accountUUID)
-            }
-
-        val affectedRows = query.executeUpdate()
+        val affectedRows = openConnection()
+            .executeUpdate("UPDATE bank_account SET balance = (balance + ?) WHERE id = ?", amount, accountUUID)
 
         if (affectedRows == 0)
             throw NonExistingAccountException(accountUUID)
@@ -69,11 +62,25 @@ class DatabaseBankRepository : BankRepository {
     }
 
     override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {
-        if (!accountExists(accountUUID))
-            throw NonExistingAccountException(accountUUID)
+        val balance = balanceFor(accountUUID)
 
-        throw InsufficientFundException(accountUUID)
+        if (balance < amount) {
+            throw InsufficientFundException(accountUUID)
+        }
+
+        openConnection()
+            .executeUpdate("UPDATE bank_account SET balance = (balance - ?) WHERE id = ?", amount, accountUUID)
+
+        return true
     }
 
     private fun openConnection(): Connection = DriverManager.getConnection(jdbcConnectionUrl)
+
+    private fun Connection.executeUpdate(sql: String, vararg params: Any): Int {
+        val query = prepareStatement(sql)
+        params.forEachIndexed { index, param ->
+            query.setObject(index + 1, param)
+        }
+        return query.executeUpdate()
+    }
 }

@@ -129,6 +129,17 @@ class DatabaseBankRepositoryTest {
     }
 
     @Test
+    fun `withdraw from an account with sufficient fund`() {
+        val existingAccountUUID = repository.createAccount()
+        repository.depositInto(existingAccountUUID, BigDecimal(100))
+
+        repository.withdrawFrom(existingAccountUUID, BigDecimal(50))
+
+        val balance = repository.balanceFor(existingAccountUUID)
+        assertThat(balance).isEqualTo(BigDecimal(100 - 50))
+    }
+
+    @Test
     fun `multiple accounts scenario`() {
         val firstAccountUUID = repository.createAccount()
         val secondAccountUUID = repository.createAccount()
