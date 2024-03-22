@@ -69,7 +69,10 @@ class DatabaseBankRepository : BankRepository {
     }
 
     override fun withdrawFrom(accountUUID: UUID, amount: BigDecimal): Boolean {
-        throw NonExistingAccountException(accountUUID)
+        if (!accountExists(accountUUID))
+            throw NonExistingAccountException(accountUUID)
+
+        throw InsufficientFundException(accountUUID)
     }
 
     private fun openConnection(): Connection = DriverManager.getConnection(jdbcConnectionUrl)

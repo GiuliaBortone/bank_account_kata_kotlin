@@ -12,3 +12,5 @@ interface BankRepository {
 }
 
 class NonExistingAccountException(accountUUID: UUID) : Exception("Account with $accountUUID does not exist")
+class InsufficientFundException(accountUUID: UUID) : Exception("Account with $accountUUID does not have enough fund")
+
