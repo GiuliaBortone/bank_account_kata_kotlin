@@ -105,4 +105,19 @@ class DatabaseBankRepositoryTest {
 
         assertThat(balance).isEqualTo(BigDecimal(100 + 200))
     }
+
+    @Test
+    fun `multiple accounts scenario`() {
+        val firstAccountUUID = repository.createAccount()
+        val secondAccountUUID = repository.createAccount()
+
+        assertThat(repository.balanceFor(firstAccountUUID)).isZero()
+        assertThat(repository.balanceFor(secondAccountUUID)).isZero()
+
+        repository.depositInto(firstAccountUUID, BigDecimal(100))
+        repository.depositInto(secondAccountUUID, BigDecimal(200))
+
+        assertThat(repository.balanceFor(firstAccountUUID)).isEqualTo(BigDecimal(100))
+        assertThat(repository.balanceFor(secondAccountUUID)).isEqualTo(BigDecimal(200))
+    }
 }
