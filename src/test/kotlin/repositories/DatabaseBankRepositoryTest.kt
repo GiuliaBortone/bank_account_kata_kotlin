@@ -107,6 +107,17 @@ class DatabaseBankRepositoryTest {
     }
 
     @Test
+    fun `withdraw from non existing account`() {
+        val nonExistingAccountUUID = UUID.fromString("dac80052-4b24-468e-b11c-c0836c715eb3")
+
+        val thrownException = assertThrows<NonExistingAccountException> {
+            repository.withdrawFrom(nonExistingAccountUUID, BigDecimal(100))
+        }
+
+        assertThat(thrownException).hasMessage("Account with dac80052-4b24-468e-b11c-c0836c715eb3 does not exist")
+    }
+
+    @Test
     fun `multiple accounts scenario`() {
         val firstAccountUUID = repository.createAccount()
         val secondAccountUUID = repository.createAccount()
